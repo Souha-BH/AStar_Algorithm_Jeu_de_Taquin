@@ -1,3 +1,62 @@
+def BFS_Search():
+    
+    if EtatInitial==EtatFinal : print('Solution deja prete')
+    NoeudV=[EtatInitial] 
+    Lista=[EtatInitial]
+    
+    B=True
+    i=0
+    
+    while(B):
+        Lista2=[]
+        
+        for Etat in Lista :
+        
+            for E in PossibleResults(Etat):
+                
+                if E not in NoeudV: 
+                   
+                   NoeudV.append(E)
+                   Lista2.append(E)
+                   #Affichage(E)
+                   #print(':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::')    
+        
+        #print('\n')
+        i+=1
+        print(i)
+
+        
+        if EtatFinal in Lista2 : 
+            B=False
+            print('Success')
+            Affichage(EtatFinal)
+            print("Nombre Noeuds Visités",len(NoeudV))
+            break
+
+        Lista=Lista2.copy()
+        
+def DFS_Search():
+    if EtatInitial==EtatFinal : print('Solution deja prete')
+    NoeudV=[EtatInitial] 
+    Stack=[EtatInitial]
+    B=True
+    while(B): 
+        Found=False
+        for E in PossibleResults(Stack[0]):
+            if E not in NoeudV: 
+                Found=True
+                Stack.insert(0,E)
+                NoeudV.append(E)
+                #print(Stack,"\n")
+                break
+               
+        if EtatFinal in NoeudV : 
+            print("Success")
+            print(len(NoeudV))
+            B=False
+        if Found==False:
+            Stack.pop(0)
+
 EtatInitial = [7,2,4,5,0,6,8,3,1]
 EtatFinal = [0,1,2,3,4,5,6,7,8]
 Voisins = [
@@ -63,6 +122,7 @@ class List():
  
 def AStar(start,goal,heuristiqueFunc):
     
+    visitedNodes = 0
     start_list=List(None,start)
     start_list.g=0
     start_list.h=heuristiqueFunc(start_list.ListValues)
@@ -77,6 +137,7 @@ def AStar(start,goal,heuristiqueFunc):
     open_list.append(start_list)
     
     while (len(open_list)>0):
+        visitedNodes+=1
         current_list=open_list[0]
         current_index=0
         
@@ -94,7 +155,7 @@ def AStar(start,goal,heuristiqueFunc):
             while current is not None:
                 path.append(current.ListValues)
                 current=current.parent
-            return path[::-1]
+            return path[::-1], visitedNodes
         
         for child in PossibleResults(current_list.ListValues):
             isChildInClosed = False
@@ -112,6 +173,7 @@ def AStar(start,goal,heuristiqueFunc):
                 #     if child_list.ListValues == open_child.ListValues and child_list.g>open_child.g:
                 #         continue
                 open_list.append(child_list)
+    
 
 def printNode(node):
     i = 0
@@ -120,12 +182,13 @@ def printNode(node):
         print('\n')
         i += 3
 
-def printPath(path):
-    for node in path:
+def printPath(result):
+    for node in result[0]:
         print("---------------- NODE -----------------------")
         printNode(node)
         print("---------------------------------------------")  
-    return(len(path))  
+    print("VISITED NODES :" + str(result[1]))
+    return(result[1]) 
 
 length2 = printPath(AStar(EtatInitial,EtatFinal,heuristique_2));
 length1 = printPath(AStar(EtatInitial,EtatFinal,heuristique_1));
@@ -136,6 +199,6 @@ print(length2)
 diff= length1 - length2
 print(diff)
 if diff<0:
-    print("heuristique 1 is better")
-else:
     print("heuristique 2 is better")
+else:
+    print("heuristique 1 is better")
